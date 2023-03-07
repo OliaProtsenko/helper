@@ -66,7 +66,9 @@ class AuthPageScaffold extends StatelessWidget {
                   PrimaryButton(
                       title: primaryButtonTitle,
                       onTap: onPrimaryButtonTap,
-                      color: theme.colorScheme.primary),
+                      color: theme.colorScheme.primary,
+                    width: double.maxFinite,
+                    height:54,),
                   const SizedBox(
                     height: Dimensions.space16,
                   ),
@@ -74,6 +76,8 @@ class AuthPageScaffold extends StatelessWidget {
                     title: secondaryButtonTitle,
                     onTap: onSecondaryButtonTap,
                     color: theme.colorScheme.primary.withOpacity(0.2),
+                    width: double.maxFinite,
+                    height:54,
                   ),
                 ],
               ),

@@ -32,7 +32,9 @@ class WelcomeScreen extends StatelessWidget {
                 onTap: () {
                   Navigator.of(context).pushNamed('/sign_in');
                 },
-                color: theme.colorScheme.primary),
+                color: theme.colorScheme.primary,
+            width: double.maxFinite,
+            height:54,),
             const SizedBox(
               height: 15,
             ),
@@ -40,6 +42,8 @@ class WelcomeScreen extends StatelessWidget {
               title: 'Registration',
               onTap: () => Navigator.of(context).pushNamed('/sign_up'),
               color: theme.colorScheme.primary.withOpacity(0.6),
+              width: double.maxFinite,
+              height:54,
             ),
           ],
         ),

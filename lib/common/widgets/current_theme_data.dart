@@ -14,12 +14,24 @@ class CurrentThemeData {
           fontSize: 22,
           letterSpacing: -0.4,
         ),
+        headline3: TextStyle(
+          fontWeight: FontWeight.w700,
+          fontSize: 28,
+          letterSpacing: -0.4,
+        ),
+        headline4: TextStyle(
+          color: Color(0xFF41444E),
+          fontWeight: FontWeight.w600,
+          fontSize: 16,
+          letterSpacing: -0.4,
+        ),
         subtitle1: TextStyle(
           color: Color(0xff979aab),
           fontWeight: FontWeight.w400,
           fontSize: 14,
           letterSpacing: -0.4,
         ),
+
         button: TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.w600,

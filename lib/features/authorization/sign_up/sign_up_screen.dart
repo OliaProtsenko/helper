@@ -3,7 +3,9 @@ import 'package:helper/common/widgets/auth_page_scaffold.dart';
 import 'package:helper/common/widgets/four_digit_code_input_widget.dart';
 import 'package:provider/provider.dart';
 
+import '../auth_cubit.dart';
 import 'bloc/sign_up_bloc.dart';
+import 'bloc/sign_up_state.dart';
 import 'sign_up_step_widget.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -15,18 +17,16 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
-  late String _username;
-  late String _password;
 
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<SignUpBloc>();
     final theme= Theme.of(context);
-    return StreamBuilder<SignUpStep>(
+    return StreamBuilder<SignUpState>(
         stream: bloc.state,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            final step = snapshot.data!;
+            final state = snapshot.data!;
             return AuthPageScaffold(
               appBarButtonTitle: 'Previous page',
               child: Padding(
@@ -50,17 +50,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       SignUpStepWidget(
                         stepCount: SignUpStep.values.length,
-                        activeStepIndex: step.index,
+                        activeStepIndex: state.step.index,
                       ),
                       const SizedBox(
                         height: 24.0,
                       ),
                       Text(
-                        getSubtitle(step),
+                        getSubtitle(state.step),
                         style: theme.textTheme.subtitle1,
                       ),
                       const SizedBox(height: 16.0),
-                      getCurrentStepForm(step),
+                      getCurrentStepForm(state),
                     ],
                   ),
                 ),
@@ -69,9 +69,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
               onPrimaryButtonTap: () => bloc.nextStep(),
               secondaryButtonTitle: 'Sign in',
               onSecondaryButtonTap: () {
-                Navigator.of(context).pushReplacementNamed('/sign_in');
+                context.read<AuthCubit>().showLogin();
               },
-              onBackButtonTap: step == SignUpStep.firstStep
+              onBackButtonTap: state.step == SignUpStep.firstStep
                   ? () => bloc.previousStep()
                   : null,
             );
@@ -91,7 +91,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-  Widget firstStepForm() {
+  Widget firstStepForm(SignUpState state) {
     return Form(
       key: _formKey,
       child: Column(
@@ -107,16 +107,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
               ),
             ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                //todo: Add regex to check email
-                return 'Please enter your name';
-              }
-              return null;
-            },
-            onSaved: (value) {
-              _username = value!;
-            },
+            validator: (value)=> state.isValidUsername ? null : 'Username is too short',
+            onChanged: (value) => context.read<SignUpBloc>().changeUsername(value),
           ),
           const SizedBox(height: 12),
           TextFormField(
@@ -129,22 +121,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
               ),
             ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your email';
-              }
-              return null;
-            },
-            onSaved: (value) {
-              _password = value!;
-            },
-          ),
+            validator: (value) => state.isValidEmail ? null : 'Invalid email',
+            onChanged: (value) => context.read<SignUpBloc>().changeEmail(value),
+            ),
         ],
       ),
     );
   }
 
-  Widget thirdStepForm() {
+  Widget thirdStepForm(SignUpState state) {
     return TextFormField(
       decoration: const InputDecoration(
         labelText: 'Password',
@@ -156,26 +141,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
       ),
       obscureText: true,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter your password';
-        }
-        return null;
-      },
-      onSaved: (value) {
-        _password = value!;
-      },
+      validator: (value) =>
+      state.isValidPassword ? null : 'Password is too short',
+      onChanged: (value) => context.read<SignUpBloc>().changePassword(value),
     );
   }
 
-  Widget getCurrentStepForm(SignUpStep step) {
-    switch (step) {
+  Widget getCurrentStepForm(SignUpState state) {
+    switch (state.step) {
       case SignUpStep.firstStep:
-        return firstStepForm();
+        return firstStepForm(state);
       case SignUpStep.secondStep:
         return const FourDigitCodeInput();
       case SignUpStep.thirdStep:
-        return thirdStepForm();
+        return thirdStepForm(state);
     }
   }
 }
